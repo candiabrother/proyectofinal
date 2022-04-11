@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+    db:
+        container_name: database
+        image: mysql
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: candia
+            MYSQL_DATABASE: candiacinemas
+            MYSQL_USER: candia
+            MYSQL_PASSWORD: candia
+        volumes:
+          - ./candiacinemas/data:/docker-entrypoint-initdb.d
+
+    php-apache-environment:
+        container_name: pagina
+        restart: always
+        build:
+            context: ./candiacinemas
+            dockerfile: Dockerfile
+        depends_on:
+            - db
+        volumes:
+            - ./candiacinemas:/var/www/html/
+        ports:
+            - 8089:80
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        ports:
+            - '8080:80'
+        restart: always
+        environment:
+            PMA_HOST: database
+        depends_on:
+            - db
